@@ -6,31 +6,27 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+
 #include "c.h"
 #include "PacketForge.h"
-#include "netio.h"
+#include "strix.h"
+#include "cli.h"
 
-int main(int argc, char *argv[]){
-    
-    int s;
-    struct sockaddr_in sin;
 
-    fprintf(stdout, "Strix\n");
-     
-    Packet * pkt = forge("192.168.0.145", "192.168.0.1", 6666);
-    //struct iphdr * ip_header = GetIpHeader(pkt->packet_ptr);
-    //struct udphdr * udp_header = GetUdpHeader(pkt->packet_ptr);
+
+
+
+int main(int argc, char **argv){
+
     
-    s = socket (AF_INET, SOCK_RAW, IPPROTO_RAW);
-    sin.sin_family = AF_INET;
-    sin.sin_port = htons(6666);
-    sin.sin_addr.s_addr = inet_addr ("192.168.0.1");
-    
-    if(sendto(s, pkt->packet_ptr, pkt->size, 0, (struct sockaddr *) &sin, sizeof (sin)) < 0){
-        perror("sendto failed"); 
-    }
-    
-    free(pkt->packet_ptr);
-    free(pkt);
-    return 0;
+  AttackPlan * plan = createAttackPlan(argc, argv);
+  fprintf(stdout, "Strix\n");
+  
+  fprintf(stdout, "target:%s\n", plan->target);
+  fprintf(stdout, "amplifier:%s\n", plan->amp);
+  executeAttackPlan( plan );
+  fprintf(stdout, "Good Bye\n");
+  free(plan);
+  return 0;
+
 }

@@ -7,6 +7,8 @@
 #ifndef PACKETFURNACE_H
   #define PACKETFURNACE_H
 
+#include "strix.h"
+
 #define GetIpHeader(X)  ( (struct iphdr *) (X) )
 #define GetUdpHeader(X) ( (struct udphdr *) (X + sizeof(struct iphdr)) )
 
@@ -36,15 +38,11 @@ typedef struct PacketPlanData {
    Pointer plan;
 }PacketPlan;
 
-typedef struct  PacketData {
-    Pointer packet_ptr;
-    size_t size;
-    uint16_t type;
 
- }Packet;
+void release_packet( Packet * pkt);
 
 PacketPlan * createUdpPlan(  char * ip_dest, char * ip_src, int port );
 
-Packet * forge( char * ip_dest, char * ip_src, int port);
+Packet * forgeUDP( char * ip_dest, char * ip_src, int port);
 
 #endif

@@ -7,8 +7,19 @@
 
 #include "c.h"
 #include "PacketForge.h"
+#include "strix.h"
 
- uint16_t ip_checksum(const void *buf, size_t hdr_len)
+void release_packet( Packet * pkt)
+{
+  if(NULL != pkt){
+    free(pkt->packet_ptr);
+    close_socket(pkt->socket);
+    free(pkt);
+    pkt = NULL;
+  }
+}
+
+uint16_t ip_checksum(const void *buf, size_t hdr_len)
 {
         unsigned long sum = 0;
         const uint16_t *ip1;
@@ -28,29 +39,18 @@
          return(~sum);
  }
 
-PacketPlan * createUdpPlan(  char * ip_dest, char * ip_src, int port )
+Packet * forgeUDP( char * ip_dest, char * ip_src, int port)
 {
-  PacketPlan * plan;
-    
-  plan = NULL; //keep compiler quiet
-  return plan;
-}
-
-Packet * forge( char * ip_dest, char * ip_src, int port)
-{
-
-
-  Packet *pac;
-  Pointer datagram;                              // Datagram to represent the packet
-  Pointer payload;
-    
+  Packet *pac = NULL;
+  Pointer datagram = NULL;                              // Datagram to represent the packet
+  
   memalloc( (void *)&pac, sizeof(Packet), __func__ );
   memalloc( (void *)&datagram, sizeof(Pointer) * 4096, __func__ );
 
   struct iphdr *ip_header = (struct iphdr *)datagram;                                  // Pointer to the beginning of ip header
   struct udphdr *udp_header = (struct udphdr *)(datagram + sizeof(struct iphdr));   // Pointer to the beginning of udp header
     
-  payload = datagram + sizeof(struct iphdr) + sizeof(struct udphdr);               // Pointer to the beginning of payload
+  Pointer payload = datagram + sizeof(struct iphdr) + sizeof(struct udphdr);               // Pointer to the beginning of payload
     
   strcpy(payload, "PacketFurnace");
     
@@ -73,9 +73,14 @@ Packet * forge( char * ip_dest, char * ip_src, int port)
   udp_header->len = htons(sizeof(struct udphdr) + strlen(payload));
   udp_header->check = 0;
 
+
   pac->packet_ptr = datagram;
   pac->size = ip_header->tot_len;
   pac->type = IPPROTO_UDP;
+  pac->sin.sin_family = AF_INET;
+  pac->sin.sin_port = htons(6666);
+  pac->sin.sin_addr.s_addr = inet_addr(ip_src);
+  pac->socket = create_socket();
 
   return pac;
 }

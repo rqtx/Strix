@@ -18,10 +18,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -g")
 include_directories(src/include)
 
 set(STRIX_SOURCES 
-  src/main.c 
+  src/main.c
+  src/cli.c
   src/error.c 
   src/PacketForge.c 
-  src/netio.c 
+  src/strix.c 
   src/memutils.c
 )
 

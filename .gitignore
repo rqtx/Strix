@@ -55,3 +55,6 @@ dkms.conf
 build/
 bin/
 compile_commands.json
+
+#gdb
+gdb.txt

