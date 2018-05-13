@@ -1,13 +1,11 @@
 
 /*
- *  PacketFurnace.h
+ *  packetforge.h
  *          
  */
 
 #ifndef PACKETFURNACE_H
   #define PACKETFURNACE_H
-
-#include "strix.h"
 
 #define GetIpHeader(X)  ( (struct iphdr *) (X) )
 #define GetUdpHeader(X) ( (struct udphdr *) (X + sizeof(struct iphdr)) )
@@ -31,18 +29,18 @@ IPPROTO_EON		    80		ISO cnlp
 IPPROTO_RAW		    255		raw IP packet 
 IPPROTO_MAX		    256
 */
+#define MEMCACHED_GET 200
+#define MEMCACHED_SET 201
 
+typedef struct  PacketData {
+  Pointer packet_ptr;
+  size_t size;
+  uint16_t type;
+}Packet;
 
-typedef struct PacketPlanData {
-   uint16_t type;       //Standard well-defined IP protocols
-   Pointer plan;
-}PacketPlan;
+void release_packet( Packet ** pkt);
 
-
-void release_packet( Packet * pkt);
-
-PacketPlan * createUdpPlan(  char * ip_dest, char * ip_src, int port );
-
-Packet * forgeUDP( char * ip_dest, char * ip_src, int port);
+Packet * forgeUDP(char * ip_dest, char * ip_src, int dest_port, int src_port, char *payload_data, int payload_size);
+Packet * forgeMemcached( int opcode );
 
 #endif

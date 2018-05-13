@@ -1,6 +1,5 @@
 /*
- *  netio.h
- *    Socket interface functions
+ *  strix.h
  */
 
 #ifndef STRIX_H
@@ -9,25 +8,23 @@
 #include <netinet/in.h>
 #include "strix_defines.h"
 #include "c.h"
+#include "packetforge.h"
 #include "error.h"
 
 typedef struct AttackPlanData {
-  char * target;
-  char * amp;
+  char * target_ip;
+  char * amp_ip;
+  int target_port;
+  int amp_port;
+  bool harakiri; 
 }AttackPlan;
 
-typedef struct  PacketData {
-  Pointer packet_ptr;
-  struct sockaddr_in sin;
-  int socket;
-  size_t size;
-  uint16_t type;
+typedef struct AttackData {
+  Packet * getPacket;
+  Packet * setPacket;
+  AttackPlan * atkPlan;
+}AttackData;
 
-}Packet;
-
-void executeAttackPlan( AttackPlan * plan );
-int create_socket( void );
-void close_socket( int );
-bool send_packet( Packet * pkt);
+void executeAttack( AttackPlan * plan );
 
 #endif

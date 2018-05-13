@@ -4,7 +4,7 @@
 
 void memalloc( void ** p_ptr, size_t p_size, const char * const p_func )
 {
-  if( NULL != p_ptr && NULL == *p_ptr )
+  if( NULL != p_ptr )
   {
     *p_ptr = malloc( p_size );
         

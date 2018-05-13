@@ -21,7 +21,7 @@ set(STRIX_SOURCES
   src/main.c
   src/cli.c
   src/error.c 
-  src/PacketForge.c 
+  src/packetforge.c 
   src/strix.c 
   src/memutils.c
 )

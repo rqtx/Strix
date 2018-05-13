@@ -7,5 +7,6 @@
   #define ERROR_H
 
 void fatal_error( char * p_error );
+void warning( char * p_error );
 
 #endif

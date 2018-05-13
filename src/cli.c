@@ -3,6 +3,7 @@
 
 #include "strix.h"
 #include "cli.h"
+#include "memcached.h"
 
 #define DELIM "."
 
@@ -20,14 +21,14 @@ AttackPlan * plan = NULL;
 
 static int
 parse_opt (int key, char *arg, struct argp_state *state)
-{
+{ 
   switch (key)
   {
   case 't': 
-    plan->target = arg;   
+    plan->target_ip = arg;   
     break;
   case 'a': 
-    plan->amp = arg;
+    plan->amp_ip = arg;
     break;
  }
  return 0;
@@ -53,7 +54,7 @@ valid_digit(Pointer ip_str)
 static bool 
 is_valid_ipv4(Pointer ip_str)
 {
-  int num, dots = 0;
+  int dots = 0;
   char ip_copy[16];
   Pointer ptr;
   
@@ -69,7 +70,7 @@ is_valid_ipv4(Pointer ip_str)
   }
  
   while (ptr) {
- 
+    int num; 
     /* after parsing string, it must contain only digits */
     if (!valid_digit(ptr)){
       return false;
@@ -103,13 +104,23 @@ plan_validate( void )
 {
   assert( NULL != plan );
 
-  if( NULL == plan->target || !is_valid_ipv4(plan->target )){
+  if( NULL == plan->target_ip || !is_valid_ipv4(plan->target_ip )){
     fatal_error("FATAL:Invalid target IPV4\n");
   }
 
-  if( NULL == plan->amp || !is_valid_ipv4(plan->amp )){
+  if( NULL == plan->amp_ip || !is_valid_ipv4(plan->amp_ip )){
     fatal_error("FATAL:Invalid amplifier IPV4\n");
   }
+
+  if( plan->amp_port == 0){
+    plan->amp_port = MEMCACHED_DEFAULT_PORT;
+  }
+
+  if( plan->target_port == 0){
+    plan->target_port = MEMCACHED_DEFAULT_PORT;
+  } 
+
+
 }
 
 AttackPlan * 
@@ -119,6 +130,6 @@ createAttackPlan(int argc, char ** argv)
   struct argp argp = { options, parse_opt, 0, 0 };
   memalloc((void *)&plan, sizeof(AttackPlan), __func__);
   argp_parse (&argp, argc, argv, 0, 0, 0);
-  plan_validate(); 
+  plan_validate();
   return plan;
 }
