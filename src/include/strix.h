@@ -16,7 +16,8 @@ typedef struct AttackPlanData {
   char * amp_ip;
   int target_port;
   int amp_port;
-  bool harakiri; 
+  float throughput;
+  bool ampTest; 
 }AttackPlan;
 
 typedef struct AttackData {

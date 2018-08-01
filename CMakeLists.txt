@@ -14,7 +14,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -g -lpthread -D _DEFAULT_SOURCE")
 include_directories(src/include)
 
 set(STRIX_SOURCES 
@@ -24,6 +24,7 @@ set(STRIX_SOURCES
   src/packetforge.c 
   src/strix.c 
   src/memutils.c
+  src/injector.c
 )
 
 

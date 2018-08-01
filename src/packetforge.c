@@ -160,7 +160,7 @@ Packet * ForgeMemcachedUDP(Pointer ip_dest, Pointer ip_src, int dest_port, int s
       break;
     
     default:
-      fatal_error( "Packet Forge opcode error" );      
+      handle_fatal( "Packet Forge opcode error" );      
   }
   
 

