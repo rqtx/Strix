@@ -1,7 +1,7 @@
 /*Code inspired on t50 */
 #include <errno.h>
 #include "netbasic.h"
-#include "strix_defines.h"
+#include "strix.h"
 int 
 create_socket( void )
 {
@@ -53,11 +53,21 @@ bool send_packet(int socket, const void *buf, size_t len, struct sockaddr *saddr
 {
   if( unlikely( -1 == sendto(socket, buf, len, MSG_NOSIGNAL, saddr, sizeof(struct sockaddr_in)) ) ){
     if (errno == EPERM){
-      handle_fatal("Cannot send packet (Permission!?). Please check your firewall rules (iptables?).\n");
+      handle_warning("Cannot send packet (Permission!?). Please check your firewall rules (iptables?).\n");
     }
 
     return false;
   }
 
   return true;
+}
+
+bool send_data(const void *buf, size_t len, struct sockaddr *saddr)
+{
+  int socket = create_socket();
+  bool rtn;
+
+  rtn = send_packet(socket, buf, len, saddr);
+  close_socket(socket);
+  return rtn;
 }

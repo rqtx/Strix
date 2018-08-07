@@ -22,13 +22,6 @@ typedef struct {
   int size;
 }InjectionArray;
 
-
-InjectionArray injectArray = {
-  .array = NULL,
-  .free = NULL,
-  .size = 0
-};
-
 int CreateInjection(Packet *pkt, float thp);
 void InjectionStart(int id);
 

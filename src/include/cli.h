@@ -8,7 +8,10 @@
   #define CLI_H
 
 #include "strix.h"
+#include "executor.h"
 
-AttackPlan * createAttackPlan(int argc, char ** argv);
+#define THROUGHPUT_DEFAULT 0
+
+AttackDraft * createAttackDraft(int argc, char ** argv);
 
 #endif

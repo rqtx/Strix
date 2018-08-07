@@ -7,6 +7,8 @@
 #ifndef PACKETFURNACE_H
   #define PACKETFURNACE_H
 
+#include "strix.h"
+
 #define GetIpHeader(X)  ( (struct iphdr *) (X) )
 #define GetUdpHeader(X) ( (struct udphdr *) (X + sizeof(struct iphdr)) )
 
@@ -31,12 +33,6 @@ IPPROTO_MAX		    256
 */
 #define MEMCACHED_GET 200
 #define MEMCACHED_SET 201
-
-typedef struct  PacketData {
-  Pointer packet_ptr;
-  size_t size;
-  uint16_t type;
-}Packet;
 
 void release_packet( Packet ** pkt);
 

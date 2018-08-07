@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include "c.h"
+#include "strix.h"
 #include "packetforge.h"
 #include "memcached.h"
 
@@ -147,8 +147,14 @@ Packet * ForgeMemcachedUDP(Pointer ip_dest, Pointer ip_src, int dest_port, int s
 {
   Packet *pac = NULL;
   Packet *memcachedPac;
-   
+  struct sockaddr_in *saddr = NULL;
+  
+  memalloc( (void *)saddr, sizeof(struct sockaddr_in), __func__);
   memalloc( (void *)&pac, sizeof(Packet), __func__ );
+
+  saddr->sin_family = AF_INET;
+  saddr->sin_port = htons(dest_port);
+  saddr->sin_addr.s_addr = inet_addr(ip_dest);
 
   switch( opcode ){
     case MEMCACHED_GET:
@@ -166,7 +172,9 @@ Packet * ForgeMemcachedUDP(Pointer ip_dest, Pointer ip_src, int dest_port, int s
 
   memcachedPac = forgeMemcached(pac->type);
   pac = forgeUDP( ip_dest, ip_src, dest_port, src_port, memcachedPac->packet_ptr, memcachedPac->size);
-  
+  pac->dest_port = dest_port;
+  pac->saddr = saddr;
+
   release_packet(&memcachedPac);
 
   return pac;

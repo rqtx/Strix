@@ -6,23 +6,23 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include "c.h"
-#include "packetforge.h"
 #include "strix.h"
+#include "manager.h"
+#include "planner.h"
 #include "cli.h"
 
 int main(int argc, char **argv)
 {
 
     
-  AttackPlan * plan = createAttackPlan(argc, argv);
+  AttackDraft * draft = createAttackDraft(argc, argv);
   fprintf(stdout, "Strix\n");
   
-  fprintf(stdout, "target:%s\n", plan->target_ip);
-  fprintf(stdout, "amplifier:%s\n", plan->amp_ip);
-  executeAttack( plan );
+  fprintf(stdout, "target:%s\n", draft->target_ip);
+  fprintf(stdout, "amplifier:%s\n", draft->amp_ip);
+  StrixManager( draft, 1 );
   fprintf(stdout, "Good Bye\n");
-  free(plan);
+  free(draft);
   return 0;
 
 }

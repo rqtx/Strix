@@ -4,6 +4,7 @@
 #include "strix.h"
 #include "cli.h"
 #include "memcached.h"
+#include "planner.h"
 
 #define DELIM "."
 
@@ -18,7 +19,7 @@ struct argp_option options[] =
     { 0 }
   };
 
-AttackPlan * plan = NULL;
+AttackDraft * draft = NULL;
 
 static int
 parse_opt (int key, char *arg, struct argp_state *state)
@@ -26,13 +27,13 @@ parse_opt (int key, char *arg, struct argp_state *state)
   switch (key)
   {
     case 't': 
-      plan->target_ip = arg;   
+      draft->target_ip = arg;   
       break;
     case 'a': 
-      plan->amp_ip = arg;
+      draft->amp_ip = arg;
       break;
     case 'p':
-      plan->throughput = (int) *arg;
+      draft->throughput = (int) *arg;
       break;
   }
   return 0;
@@ -106,36 +107,36 @@ is_valid_ipv4(Pointer ip_str)
 static void
 plan_validate( void )
 {
-  assert( NULL != plan );
+  assert( NULL != draft );
 
-  if( NULL == plan->target_ip || !is_valid_ipv4(plan->target_ip )){
+  if( NULL == draft->target_ip || !is_valid_ipv4(draft->target_ip )){
     handle_fatal("FATAL:Invalid target IPV4\n");
   }
 
-  if( NULL == plan->amp_ip || !is_valid_ipv4(plan->amp_ip )){
+  if( NULL == draft->amp_ip || !is_valid_ipv4(draft->amp_ip )){
     handle_fatal("FATAL:Invalid amplifier IPV4\n");
   }
 
-  if( plan->amp_port == 0){
-    plan->amp_port = MEMCACHED_DEFAULT_PORT;
+  if( draft->amp_port == 0){
+    draft->amp_port = MEMCACHED_DEFAULT_PORT;
   }
 
-  if( plan->target_port == 0){
-    plan->target_port = MEMCACHED_DEFAULT_PORT;
+  if( draft->target_port == 0){
+    draft->target_port = MEMCACHED_DEFAULT_PORT;
   }
 
-  if( plan->throughput <= 0 ){
-    plan->throughput = THROUGHPUT_DEFAULT; 
+  if( draft->throughput <= 0 ){
+    draft->throughput = THROUGHPUT_DEFAULT; 
   }
 }
 
-AttackPlan * 
-createAttackPlan(int argc, char ** argv)
+AttackDraft * 
+createAttackDraft(int argc, char ** argv)
 {
 
   struct argp argp = { options, parse_opt, 0, 0 };
-  memalloc((void *)&plan, sizeof(AttackPlan), __func__);
+  memalloc((void *)&draft, sizeof(AttackPlan), __func__);
   argp_parse (&argp, argc, argv, 0, 0, 0);
   plan_validate();
-  return plan;
+  return draft;
 }

@@ -22,9 +22,11 @@ set(STRIX_SOURCES
   src/cli.c
   src/error.c 
   src/packetforge.c 
-  src/strix.c 
+  src/executor.c 
   src/memutils.c
   src/injector.c
+  src/manager.c
+  src/planner.c
 )
 
 
