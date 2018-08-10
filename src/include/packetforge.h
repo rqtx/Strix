@@ -34,7 +34,7 @@ IPPROTO_MAX		    256
 #define MEMCACHED_GET 200
 #define MEMCACHED_SET 201
 
-void release_packet( Packet ** pkt);
+void ReleasePacket( Packet ** pkt);
 
 Packet * ForgeMemcachedUDP( Pointer ip_dest, Pointer ip_src, int dest_port, int src_port, int opcode );
 

@@ -18,4 +18,6 @@ bool send_packet(int socket, const void *buf, size_t len, struct sockaddr *saddr
 
 bool send_data(const void *buf, size_t len, struct sockaddr *saddr);
 
+bool Is_valid_ipv4(char * ip_str);
+
 #endif      //NETBASIC_H

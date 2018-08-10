@@ -9,6 +9,9 @@ set logging on
 
 #Breakpoints
 b main.c:main
+#b executor.c:38
+#b executor.c:18
+#b injector.c:95
 
 #Start
 run

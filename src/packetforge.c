@@ -149,7 +149,7 @@ Packet * ForgeMemcachedUDP(Pointer ip_dest, Pointer ip_src, int dest_port, int s
   Packet *memcachedPac;
   struct sockaddr_in *saddr = NULL;
   
-  memalloc( (void *)saddr, sizeof(struct sockaddr_in), __func__);
+  memalloc( (void *)&saddr, sizeof(struct sockaddr_in), __func__);
   memalloc( (void *)&pac, sizeof(Packet), __func__ );
 
   saddr->sin_family = AF_INET;
@@ -175,12 +175,12 @@ Packet * ForgeMemcachedUDP(Pointer ip_dest, Pointer ip_src, int dest_port, int s
   pac->dest_port = dest_port;
   pac->saddr = saddr;
 
-  release_packet(&memcachedPac);
+  ReleasePacket(&memcachedPac);
 
   return pac;
 }
 
-void release_packet( Packet ** p_pkt)
+void ReleasePacket( Packet ** p_pkt)
 {
   if(NULL != *p_pkt){
     free((*p_pkt)->packet_ptr);

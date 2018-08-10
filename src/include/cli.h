@@ -10,8 +10,6 @@
 #include "strix.h"
 #include "executor.h"
 
-#define THROUGHPUT_DEFAULT 0
-
 AttackDraft * createAttackDraft(int argc, char ** argv);
 
 #endif

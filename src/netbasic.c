@@ -2,8 +2,24 @@
 #include <errno.h>
 #include "netbasic.h"
 #include "strix.h"
-int 
-create_socket( void )
+
+#define DELIM "."
+
+/* return true if string contain only digits, else return false */
+static bool _valid_digit(char * ip_str)
+{
+  while (*ip_str) {
+    if (*ip_str >= '0' && *ip_str <= '9'){
+      ++ip_str;
+    }
+    else{
+      return false;
+    }
+  }
+  return true;
+}
+
+int create_socket( void )
 {
   int fd, flag;
   uint32_t n = 1;
@@ -36,8 +52,7 @@ create_socket( void )
   return fd;
 }
 
-void 
-close_socket( int fd)
+void close_socket( int fd)
 {
   /* Close only if the descriptor is valid. */
   if (fd > 0)
@@ -51,7 +66,7 @@ close_socket( int fd)
 
 bool send_packet(int socket, const void *buf, size_t len, struct sockaddr *saddr)
 {
-  if( unlikely( -1 == sendto(socket, buf, len, MSG_NOSIGNAL, saddr, sizeof(struct sockaddr_in)) ) ){
+  if( -1 == sendto(socket, buf, len, MSG_NOSIGNAL, saddr, sizeof(struct sockaddr_in)) ){
     if (errno == EPERM){
       handle_warning("Cannot send packet (Permission!?). Please check your firewall rules (iptables?).\n");
     }
@@ -70,4 +85,54 @@ bool send_data(const void *buf, size_t len, struct sockaddr *saddr)
   rtn = send_packet(socket, buf, len, saddr);
   close_socket(socket);
   return rtn;
+}
+
+ 
+/* return true if IP string is valid, else return false */
+bool Is_valid_ipv4(char * ip_str)
+{
+  int dots = 0;
+  char ip_copy[16];
+  char *ptr;
+  
+  if (ip_str == NULL){
+    return false;
+  }
+  
+  memcpy(ip_copy, ip_str, strlen(ip_str));
+  ip_copy[strlen(ip_str)] = '\0';
+  ptr = strtok(ip_copy, DELIM);
+ 
+  if (ptr == NULL){
+    return false;
+  }
+ 
+  while (ptr) {
+    int num; 
+    /* after parsing string, it must contain only digits */
+    if (!_valid_digit(ptr)){
+      return false;
+    }
+
+    num = atoi(ptr);
+ 
+    /* check for valid IPV4 */
+    if (num >= 0 && num <= 255) {
+    /* parse remaining string */
+    ptr = strtok(NULL, DELIM);
+    if (ptr != NULL)
+      ++dots;
+    } 
+    else{
+      return false;
+    }
+    
+  }
+ 
+  /* valid IPV4 string must contain 3 dots */
+  if (dots != 3){
+    return false;
+  }
+
+  return true;
 }

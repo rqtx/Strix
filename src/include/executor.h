@@ -11,6 +11,7 @@
 #include "packetforge.h"
 #include "error.h"
 
-int * executeAttack( AttackPlan * plan );
+void ExecuteAttack( AttackData * atkData );
+void DestroyAttack( AttackData * atkData );
 
 #endif
