@@ -21,6 +21,7 @@ static void *_executorHandler(void *arg)
     InjectionNewThroughput(atkData->injectorId,  throughput);
     nanosleep(&freq, NULL);
     throughput += atkData->incrementThroughput;
+    atkData->expcetedThroughput = throughput;
     loopCounter--;
   }
   
@@ -55,4 +56,9 @@ void DestroyAttack( AttackData * atkData )
 
   pthread_cancel(atkData->executorId); 
   InjectionDestroy(atkData->injectorId);
+}
+
+float GetAttackThroughput( int id )
+{
+  return InjectionCurrentThroughput(id);
 }
