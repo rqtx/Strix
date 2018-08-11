@@ -53,7 +53,8 @@ typedef struct {
   char * target_ip;
   char * amp_ip;
   float initialThroughput;
-  int incrementThroughput;    
+  int incrementThroughput;
+  int currentThroughput;
   int timeFrequency;          //Time of throughput increment frequency in seconds
   int nInjections;            //Number of injections, INF == 0 
 }AttackData;

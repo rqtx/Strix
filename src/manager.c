@@ -10,7 +10,7 @@
 #define SIGNAL_STOP 1
 #define SIGNAL_ERROR 2
 
-AttackPlan * plan;
+AttackPlan * plan = NULL;
 int interruption = NOSIGNAL;
 
 void _stopHandler (int sg)
@@ -22,7 +22,6 @@ void _errorHandler(int sg)
 {
   interruption = SIGNAL_ERROR;
 }
-
 
 static void stopStrix( )
 {

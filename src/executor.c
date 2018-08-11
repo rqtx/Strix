@@ -56,5 +56,3 @@ void DestroyAttack( AttackData * atkData )
   pthread_cancel(atkData->executorId); 
   InjectionDestroy(atkData->injectorId);
 }
-
-
