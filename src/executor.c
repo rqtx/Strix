@@ -21,7 +21,7 @@ static void *_executorHandler(void *arg)
     InjectionNewThroughput(atkData->injectorId,  throughput);
     nanosleep(&freq, NULL);
     throughput += atkData->incrementThroughput;
-    atkData->expcetedThroughput = throughput;
+    atkData->expectedThroughput = throughput;
     loopCounter--;
   }
   

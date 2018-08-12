@@ -143,6 +143,54 @@ static Packet * forgeMemcached( int opcode )
   return pac;
 }
 
+static Packet * createMemcachedCommand(int opcode)
+{
+  char *cmd = NULL;
+  Packet *pac = NULL;
+  MemcachedSetCmd *cmdSet = NULL;
+
+  memalloc( (void *)&pac, sizeof(Packet), __func__);
+
+  switch( opcode ){
+    case MEMCACHED_GET :
+      
+      memalloc( (void *)&cmd, MAXSIZE_MEMCACHED_KEY + 50, __func__);
+      pac->size = sprintf(cmd, "get %s\r\nEND\r\n", MEMCACHED_KEYSTR);
+      pac->packet_ptr = cmd;
+
+      break;
+
+    case MEMCACHED_SET :
+      
+      memalloc((void *)&cmdSet, sizeof(MemcachedSetCmd), __func__);
+      memalloc( (void *)&cmdSet->data, MAXSIZE_MEMCACHED_VALUE, __func__);
+
+      strcpy(cmdSet->cmd, "set");
+      strcpy(cmdSet->key, MEMCACHED_KEYSTR);
+      cmdSet->flags = 0;
+      cmdSet->exptime = 60*60*24;
+      cmdSet->dataLen = MAXSIZE_MEMCACHED_VALUE;
+      memset(cmdSet->data, '-', MAXSIZE_MEMCACHED_VALUE);
+      cmdSet->cas = 0;
+
+      memalloc( (void *)&cmd, sizeof(MemcachedSetCmd) + MAXSIZE_MEMCACHED_VALUE + 50, __func__);
+      pac->size = sprintf(cmd, "%s %s %hu %lu %lu [noreply]\r\n%s\r\n", cmdSet->cmd, cmdSet->key, cmdSet->flags, cmdSet->exptime, cmdSet->dataLen, cmdSet->data);
+      pac->packet_ptr = cmd;
+      
+      free(cmdSet->data);
+      free(cmdSet);
+
+      break;
+
+    case MEMCACHED_STAT :
+    default :
+      pac->size = sprintf(pac->packet_ptr, "stats\r\n");
+      break;
+  }
+
+  return pac;
+}
+
 Packet * ForgeMemcachedUDP(Pointer ip_dest, Pointer ip_src, int dest_port, int src_port, int opcode)
 {
   Packet *pac = NULL;
@@ -165,12 +213,13 @@ Packet * ForgeMemcachedUDP(Pointer ip_dest, Pointer ip_src, int dest_port, int s
       pac->type = MEMCACHED_SET; 
       break;
     
+    case MEMCACHED_STAT:
     default:
-      handle_fatal( "Packet Forge opcode error" );      
+      pac->type = MEMCACHED_STAT;
   }
   
 
-  memcachedPac = forgeMemcached(pac->type);
+  memcachedPac = createMemcachedCommand(pac->type);
   pac = forgeUDP( ip_dest, ip_src, dest_port, src_port, memcachedPac->packet_ptr, memcachedPac->size);
   pac->dest_port = dest_port;
   pac->saddr = saddr;

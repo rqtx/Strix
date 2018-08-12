@@ -53,6 +53,7 @@ typedef struct {
   char * target_ip;
   char * amp_ip;
   float initialThroughput;
+  float expectedThroughput;
   int incrementThroughput;
   int currentThroughput;
   int timeFrequency;          //Time of throughput increment frequency in seconds

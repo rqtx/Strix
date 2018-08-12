@@ -33,6 +33,7 @@ IPPROTO_MAX		    256
 */
 #define MEMCACHED_GET 200
 #define MEMCACHED_SET 201
+#define MEMCACHED_STAT 202
 
 void ReleasePacket( Packet ** pkt);
 
